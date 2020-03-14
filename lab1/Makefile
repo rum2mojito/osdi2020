@@ -1,5 +1,5 @@
 ARMGNU = aarch64-linux-gnu
-COPS = -Wall
+COPS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles
 SRCS = $(wildcard *.c)
 OBJS = $(SRCS:.c=.o)
 
