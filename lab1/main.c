@@ -20,9 +20,12 @@ main()
 		char command[20];
 		uart_read_line(command);
 		if(strcmp(command, CMD_HELP)) {
+			char help[] = "help:\t\t help";
 			char hello[] = "hello:\t\t print Hello World!";
-			char timestamp[] = "timestamp:\t show server time.";
-			char reboot[] = "reboot:\t\t reboot the raspi3.";
+			char timestamp[] = "timestamp:\t get current timestamp";
+			char reboot[] = "reboot:\t\t reboot rpi3";
+			uart_puts(help);
+			uart_send('\n');
 			uart_puts(hello);
 			uart_send('\n');
 			uart_puts(timestamp);
@@ -31,7 +34,7 @@ main()
 		} else if(strcmp(command, CMD_HELLO)) {
 			uart_puts("Hello World!");
 		} else if(strcmp(command, CMD_TIME)) {
-			uart_puts(get_timestamp());
+			get_timestamp();
 		} else if(strcmp(command, CMD_REBOOT)) {
 			reset();
 		} else {
@@ -51,6 +54,9 @@ get_timestamp()
 	// get the current counter frequency
 	asm volatile ("mrs %0, cntfrq_el0" : "=r"(f));
 	asm volatile ("mrs %0, cntpct_el0" : "=r"(c));
+	char res[30];
+	ftoa(((float)c/(float)f), res, 10);
+	uart_puts(res);
 	return c/f;
 }
 
