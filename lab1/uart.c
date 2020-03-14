@@ -47,7 +47,8 @@ uart_init()
 	*AUX_MU_CNTL = 3;
 }
 
-void uart_send(unsigned int c)
+void
+uart_send(unsigned int c)
 {
 	do {
 		asm volatile("nop");
