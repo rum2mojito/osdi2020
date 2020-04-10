@@ -58,9 +58,10 @@ void load_image(char *input_address) {
 	// asm volatile("mov sp, %0" :: "r"(address_int));
 	// void (* new_kernel)(void) = address_int;
 	// new_kernel = (void (*)(void)) 0x80000;
-	for(int i=0; i<10000000; i++) {}
-	register unsigned int r;
-	r=5000; while(r--) { asm volatile("nop"); }
+	// for(int i=0; i<10000000; i++) {}
+	// register unsigned int r;
+	// r=5000; while(r--) { asm volatile("nop"); }
+	// uart_puts("[rpi3]\tDONE!\r\n");
 	new_kernel();
 }
 
