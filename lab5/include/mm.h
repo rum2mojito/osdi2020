@@ -16,6 +16,12 @@
 #define LOW_MEMORY              (3*SECTION_SIZE)
 #define HIGH_MEMORY             DEVICE_BASE
 
+#define PTRS_PER_TABLE			(1 << TABLE_SHIFT)						   
+#define PGD_SHIFT			(PAGE_SHIFT + 3*TABLE_SHIFT) //39
+#define PUD_SHIFT			(PAGE_SHIFT + 2*TABLE_SHIFT) //30
+#define PMD_SHIFT			(PAGE_SHIFT + TABLE_SHIFT)   //21
+#define PTE_SHIFT                       (PAGE_SHIFT)                 //12
+
 #define LOW_KERNEL_STACK        LOW_MEMORY
 #define HIGH_KERNEL_STACK       LOW_MEMORY + 64 * PAGE_SIZE
 #define LOW_USER_STACK          HIGH_KERNEL_STACK

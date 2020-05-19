@@ -86,6 +86,9 @@ void test() {
 // -----------below is kernel code-------------
 
 void user_test(){
+  uart_puts("@ EL ");
+  uart_print_int(get_el());
+  uart_puts("\r\n");
   do_exec(test);
 }
 
@@ -115,9 +118,13 @@ void kernel_main() {
   uart_puts("Kernel process started. EL ");
   uart_print_int(get_el());
   uart_puts("\r\n");
+  
   asm volatile ("mov x0, #0\n" "svc #0\n");
 
+  init_idle_task(task[0]);
+
   privilege_task_create(user_test);
+  // do_exec(user_test);
 //   privilege_task_create(user_test);
 
   // idle();

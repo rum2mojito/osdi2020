@@ -41,6 +41,22 @@ struct cpu_context {
     unsigned long pc;
 };
 
+#define MAX_PROCESS_PAGES	16	
+#define MAX_AREA                16
+
+struct user_page {
+	unsigned long phys_addr;
+	unsigned long virt_addr;
+};
+
+struct mm_struct {
+	unsigned long pgd;
+	int user_pages_count;
+	struct user_page user_pages[MAX_PROCESS_PAGES];
+	int kernel_pages_count;
+	unsigned long kernel_pages[MAX_PROCESS_PAGES];
+};
+
 struct task_struct {
     struct cpu_context cpu_context;
     long state;
@@ -51,6 +67,7 @@ struct task_struct {
     unsigned long flag;
     int task_id;
     int parent_id;
+    struct mm_struct mm;
 };
 
 struct pt_regs {
@@ -73,10 +90,11 @@ int _do_fork();
 int get_taskid();
 int num_runnable_tasks();
 struct task_struct *get_current_task();
+extern struct task_struct * task[NR_TASKS];
 
 #define INIT_TASK \
 {   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, \
-    0, 5, 0, 1, 0, PF_KTHREAD, 0, 0 \
+    0, 2, 0, 1, 0, PF_KTHREAD, 0, 0 \
 }
 
 #endif

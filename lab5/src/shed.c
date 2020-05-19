@@ -53,7 +53,7 @@ void privilege_task_create(void (*func)()) {
 void _privilege_task_create(void (*func)(), int clone_flags, unsigned long stack) {
     disable_preempt();
     int page_id = get_free_page_id();
-    struct task_struct *p = (struct task_struct *) (LOW_MEMORY + page_id*PAGE_SIZE);
+    struct task_struct *p = (struct task_struct *) (LOW_MEMORY + page_id*PAGE_SIZE + VA_START);
     if(!p) {
         uart_puts("Fail to create a new task...\r\n");
         return;
@@ -62,9 +62,12 @@ void _privilege_task_create(void (*func)(), int clone_flags, unsigned long stack
     struct pt_regs *childregs = task_pt_regs(p);
 	memzero((unsigned long)childregs, sizeof(struct pt_regs));
 	memzero((unsigned long)&p->cpu_context, sizeof(struct cpu_context));
+    memzero((unsigned long)&p->mm, sizeof(struct mm_struct));
 
     if (clone_flags & PF_KTHREAD) {
 		p->cpu_context.x19 = func;
+        p->cpu_context.x20 = stack;
+        // copy_virt_memory(p);
 	} else {
 		struct pt_regs * cur_regs = task_pt_regs(current);
 		*childregs = *cur_regs;
@@ -72,14 +75,15 @@ void _privilege_task_create(void (*func)(), int clone_flags, unsigned long stack
 		childregs->regs[29] = cur_regs->regs[29] + get_user_page(page_id) - get_user_page(current->task_id);
 		childregs->sp       = cur_regs->sp + get_user_page(page_id) - get_user_page(current->task_id);
 		p->stack = stack;
+        copy_virt_memory(p);
 	}
 
     p->flag = clone_flags;
     p->task_id = n_task_id;
-    p->counter = 5;
+    p->counter = 2;
     p->state = TASK_RUNNING;
     p->preempt_count = 1;
-    p->cpu_context.x19 = (unsigned long) func;
+    // p->cpu_context.x19 = (unsigned long) func;
     p->cpu_context.pc = (unsigned long) ret_from_fork;
     p->cpu_context.sp = (unsigned long) childregs;
     p->parent_id = current->task_id;
@@ -120,7 +124,8 @@ void switch_to(struct task_struct * next)  {
 	if (current == next) 
 		return;
 	struct task_struct * prev = current;
-	current = next;
+    set_pgd(next->mm.pgd);
+	// current = next;
 	cpu_switch_to(prev, next);
 }
 
