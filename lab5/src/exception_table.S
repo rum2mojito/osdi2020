@@ -126,7 +126,8 @@ el1_exception_table:
     b el_not_implement
     .align 7
 
-    b el_not_implement
+    // special one
+    b el1_exception_handler
     .align 7
     b el1_irq_handler
     .align 7
@@ -175,6 +176,11 @@ el1_irq_handler:
 el_not_implement:
     context_switch 0
     bl      _not_implement
+    context_switch_back 0
+
+el_not_implement_test:
+    context_switch 0
+    bl      _not_implement_test
     context_switch_back 0
 
 // sync

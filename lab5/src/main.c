@@ -107,11 +107,14 @@ void idle(){
   while(1);
 }
 
-void main() {
+void kernel_main() {
   // ...
   // boot setup
   // ...
   uart_init();
+  uart_puts("Kernel process started. EL ");
+  uart_print_int(get_el());
+  uart_puts("\r\n");
   asm volatile ("mov x0, #0\n" "svc #0\n");
 
   privilege_task_create(user_test);

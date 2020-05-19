@@ -80,3 +80,9 @@ _not_implement()
 {
     uart_puts("Not implement.\r\n");
 }
+
+void
+_not_implement_test()
+{
+    uart_puts("ttttttttt.\r\n");
+}
