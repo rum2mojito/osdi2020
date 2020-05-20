@@ -91,6 +91,7 @@ int get_taskid();
 int num_runnable_tasks();
 struct task_struct *get_current_task();
 extern struct task_struct * task[NR_TASKS];
+extern struct task_struct *current;
 
 #define INIT_TASK \
 {   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, \

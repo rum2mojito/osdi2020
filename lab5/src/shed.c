@@ -125,7 +125,7 @@ void switch_to(struct task_struct * next)  {
 		return;
 	struct task_struct * prev = current;
     set_pgd(next->mm.pgd);
-	// current = next;
+	current = next;
 	cpu_switch_to(prev, next);
 }
 
@@ -137,7 +137,7 @@ void _schedule() {
     c = 0;
     next = 0;
 
-    for(int i=1; i<NR_TASKS; i++) {
+    for(int i=2; i<NR_TASKS; i++) {
         p = task[i];
         if(p && p->state == TASK_RUNNING && p->counter > c) {
             c = p->counter;
@@ -153,7 +153,7 @@ void _schedule() {
 }
 
 void schedule() {
-    // current->counter = 0;
+    current->counter = 0;
     _schedule();
     // timer_tick();
 }

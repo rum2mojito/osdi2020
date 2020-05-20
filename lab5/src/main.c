@@ -22,33 +22,24 @@
 
 void get_timestamp();
 
-void foo(){
-  int tmp = 5;
-  uart_puts("Task ");
-  uart_print_int(get_taskid());
-  uart_puts(" after exec, tmp address 0x");
-  uart_print_int(&tmp);
-  uart_puts(", tmp value ");
-  uart_print_int(tmp);
-  uart_puts("\r\n");
-//   printf("Task %d after exec, tmp address 0x%x, tmp value %d\n", get_taskid(), &tmp, tmp);
-  exit(0);
-}
+// void foo(){
+//   int tmp = 5;
+//   uart_puts("Task ");
+//   uart_print_int(get_taskid());
+//   uart_puts(" after exec, tmp address 0x");
+//   uart_print_int(&tmp);
+//   uart_puts(", tmp value ");
+//   uart_print_int(tmp);
+//   uart_puts("\r\n");
+// //   printf("Task %d after exec, tmp address 0x%x, tmp value %d\n", get_taskid(), &tmp, tmp);
+//   exit(0);
+// }
 
 void test() {
-	// while(1) {
-	// 	uart_puts("hihi\r\n");
-	// 	delay(100000000000000);
-	// }
 	
   int cnt = 1;
   int f;
   f = fork();
-  // uart_puts("fork ret: ");
-  // uart_print_int(f);
-  // uart_puts(" #run: ");
-  // uart_print_int(num_runnable_tasks());
-  // uart_puts("\r\n");
   if (f == 0) {
     fork();
     delay(100);
@@ -78,7 +69,7 @@ void test() {
 		uart_print_int(cnt);
 		uart_puts("\r\n");
 		// printf("Task %d before exec, cnt address 0x%x, cnt value %d\n", get_taskid(), &cnt, cnt);
-		exec(foo);
+		// exec(foo);
   }
 }
 
@@ -89,28 +80,49 @@ void user_test(){
   uart_puts("@ EL ");
   uart_print_int(get_el());
   uart_puts("\r\n");
-  do_exec(test);
+  exec(test);
+}
+
+void foo(){
+  while(1) {
+    uart_puts("Task id: ");
+    uart_print_int(current -> task_id);
+    uart_puts("\n");
+    delay(1000000);
+    schedule();
+  }
 }
 
 void idle(){
-	// uart_puts("idle\r\n");
   while(1){
-    uart_puts("#run tasks: ");
-    uart_print_int(num_runnable_tasks());
-    uart_puts("\r\n");
-    if(num_runnable_tasks() == 1) {
-		// uart_puts("idle\r\n");
-      break;
-    }
-    schedule();
-	  uart_puts("schedule\r\n");
-    delay(1000000000);
+    // Schedule();
+    delay(1000000);
   }
-  uart_puts("Test finished\n");
-  while(1);
 }
 
 void kernel_main() {
+  // ...
+  // boot setup
+  // ...
+  uart_init();
+  uart_getc();
+  uart_puts("MACHINE IS OPEN!!\n");
+
+  unsigned long current_el;
+  current_el = get_el();
+  uart_puts("Current EL: ");
+  uart_hex(current_el);
+
+  int N=5;
+  for(int i = 0; i < N; ++i) { // N should > 2
+    privilege_task_create(foo );
+  }
+  schedule();
+
+  idle();
+}
+
+void kernel_main_() {
   // ...
   // boot setup
   // ...
@@ -124,10 +136,11 @@ void kernel_main() {
   init_idle_task(task[0]);
 
   privilege_task_create(user_test);
+  schedule();
   // do_exec(user_test);
 //   privilege_task_create(user_test);
 
-  // idle();
+  idle();
 }
 
 // void main()
